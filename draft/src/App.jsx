@@ -12,11 +12,10 @@ function App() {
   return (
     <>
       <h1>Hello, World!</h1>
-      <ol>
-        {data.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ol>
+      <h2>
+        Data from Flask Backend: {data.length > 0 ? data[0].name : "No data"}
+      </h2>
+      <ol></ol>
     </>
   );
 }
