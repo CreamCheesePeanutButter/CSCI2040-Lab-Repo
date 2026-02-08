@@ -3,14 +3,14 @@ from flask_cors import CORS
 from sqlconnection import DatabaseConfig
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])  # React (Vite)
+CORS(app, origins=["http://localhost:5174"])  # React (Vite)
 
 
 db_config = DatabaseConfig(
-    host="localhost",
-    user="root",
-    password="LTA.4Building",
-    database="testdb"
+    host="mysql-creamcheesepeanutbutter.alwaysdata.net",
+    user="creamcheesepeanutbutter_matt",
+    password="ilikepeanutbutter",
+    database="creamcheesepeanutbutter_users"
 )
 
 @app.route("/users", methods=["GET"])
