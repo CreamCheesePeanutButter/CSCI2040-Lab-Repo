@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command \"./run.ps1\"",
+    "start-backend": "cd backend && .\\venv\\Scripts\\python api.py",
+    "start-backend-unix": "cd backend && ./venv/bin/python api.py"
   },
   "dependencies": {
     "react": "^19.2.0",
