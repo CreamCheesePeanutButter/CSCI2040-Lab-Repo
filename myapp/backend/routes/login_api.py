@@ -8,17 +8,16 @@ class LoginAPI(MethodView):
 
     def post(self):
         data = request.get_json()
-        username = data.get('username')
         password = data.get('password')
-
-        if not username or not password:
-            return jsonify({"message": "Missing username or password"}), 400
+        email = data.get('email')
+        if not password or not email:
+            return jsonify({"message": "Missing email or password"}), 400
 
         db = get_db()
         cursor = db.cursor(dictionary=True)
 
-        query = "SELECT * FROM user WHERE username = %s AND password = %s"
-        cursor.execute(query, (username, password))
+        query = "SELECT * FROM user WHERE password = %s AND email = %s"
+        cursor.execute(query, (password, email))
         user = cursor.fetchone()
 
         cursor.close()
