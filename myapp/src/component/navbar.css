@@ -30,6 +30,15 @@
   letter-spacing: 0.28em;
   color: #52B043;
   user-select: none;
+  flex-shrink: 0;
+}
+
+/* Search bar slot — grows to fill available space, centred */
+.navbar-search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
 }
 
 .navbar-links {

@@ -11,6 +11,20 @@ from tracker.stock_tracker import StockTracker
 # The blueprint now is stock_api
 stock_bp = Blueprint('stock_api', __name__)
 
+
+# Static map of ticker -> company name.
+# Finnhub's /quote endpoint does not return a name field, so we maintain
+# this lookup ourselves. Add new tickers here when expanding StockTracker.
+STOCK_NAMES = {
+    "AAPL":  "Apple Inc.",
+    "GOOGL": "Alphabet Inc.",
+    "AMZN":  "Amazon.com Inc.",
+    "MSFT":  "Microsoft Corporation",
+    "TSLA":  "Tesla Inc.",
+    "META":  "Meta Platforms Inc.",
+    "NVDA":  "NVIDIA Corporation",
+}
+
 class StockAPI(MethodView):
     # We need GET API for allowing the frontend to get the stock data
     stock_tracker = StockTracker()
@@ -42,12 +56,15 @@ class StockAPI(MethodView):
             db.commit()
             cursor.close()
         return jsonify({
-            "stocks": {ticker: {
-                "current_price": stock.current_price,
-                "high_today": stock.high_today,
-                "low_today": stock.low_today,
-                "open_price": stock.open_price,
-                "previous_close": stock.previous_close
+            "stocks": {
+                ticker: {
+                    "stock_key" : ticker,
+                    "name" :  STOCK_NAMES.get(ticker, ticker),        
+                    "current_price": stock.current_price,
+                    "high_today": stock.high_today,
+                    "low_today": stock.low_today,
+                    "open_price": stock.open_price,
+                    "previous_close": stock.previous_close
             } for ticker, stock in self.stock_tracker.stocks.items()}
         })   
 

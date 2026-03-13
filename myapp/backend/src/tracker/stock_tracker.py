@@ -22,7 +22,6 @@ class Stock:
         self.low_today = data["l"]
         self.open_price = data["o"]
         self.previous_close = data["pc"]
-        self.name = data["name"]
 
 
 class StockTracker:
