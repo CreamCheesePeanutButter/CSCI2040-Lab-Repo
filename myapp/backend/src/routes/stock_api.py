@@ -10,12 +10,12 @@ from tracker.stock_tracker import StockTracker
 # The blueprint now is stock_api
 stock_bp = Blueprint('stock_api', __name__)
 
-
+# Single shared instance — both views must use the same tracker
+# so that exchange_currency changes are visible to the GET endpoint
+_tracker = StockTracker()
 
 
 class StockAPI(MethodView):
-    # We need GET API for allowing the frontend to get the stock data
-    stock_tracker = StockTracker()
     def get(self):
         # For now we just return the data in the stock tracker
         # In the future we can add more features like adding new stocks to track, etc.
@@ -27,7 +27,7 @@ class StockAPI(MethodView):
         cursor.execute("SELECT last_call FROM stock LIMIT 1")
         result = cursor.fetchone()
         if result is None or (result[0] is None) or (result[0] < (datetime.now() - timedelta(minutes=1))):
-            for ticker, stock in self.stock_tracker.stocks.items():
+            for ticker, stock in _tracker.get_stocks().items():
                 cursor.execute(
                     """
                     INSERT INTO stock (stock_key, current_price, high_price, low_price, open_price, previous_close, name, currency)
@@ -49,14 +49,14 @@ class StockAPI(MethodView):
             "stocks": {
                 ticker: {
                     "stock_key" : ticker,
-                    "name" :  stock.name,        
+                    "name" :  stock.name,
                     "current_price": stock.current_price,
                     "high_today": stock.high_today,
                     "low_today": stock.low_today,
                     "open_price": stock.open_price,
                     "previous_close": stock.previous_close,
-                } for ticker, stock in self.stock_tracker.get_stocks().items()},
-            "currency": self.stock_tracker.get_currency()
+                } for ticker, stock in _tracker.get_stocks().items()},
+            "currency": _tracker.get_currency()
 
         }), 200  
 
@@ -64,18 +64,16 @@ user_view = StockAPI.as_view('user_api')
 stock_bp.add_url_rule('/stocks', view_func=user_view, methods=['GET'])
 
 class StockExchangeCurrencyAPI(MethodView):
-    stock_tracker = StockTracker()
     def post(self):
         currency = ""
-        if self.stock_tracker.get_currency() == "CAD":
-            self.stock_tracker.exchange_currency("USD")
+        if _tracker.get_currency() == "CAD":
+            _tracker.exchange_currency("USD")
             currency = "USD"
-
         else:
-            self.stock_tracker.exchange_currency("CAD")
+            _tracker.exchange_currency("CAD")
             currency = "CAD"
-        db = get_db()         # connection
-        cursor = db.cursor()  # cursor object
+        db = get_db()
+        cursor = db.cursor()
         cursor.execute("UPDATE stock SET currency = %s", (currency,))
         db.commit()
         cursor.close()
@@ -84,15 +82,15 @@ class StockExchangeCurrencyAPI(MethodView):
             "stocks": {
                 ticker: {
                     "stock_key" : ticker,
-                    "name" :  stock.name,        
+                    "name" :  stock.name,
                     "current_price": stock.current_price,
                     "high_today": stock.high_today,
                     "low_today": stock.low_today,
                     "open_price": stock.open_price,
                     "previous_close": stock.previous_close,
-                } for ticker, stock in self.stock_tracker.get_stocks().items()},
+                } for ticker, stock in _tracker.get_stocks().items()},
             "message": f"Exchange rate updated to {currency}",
-            "currency": currency  ,
+            "currency": currency,
 
         }), 200
     

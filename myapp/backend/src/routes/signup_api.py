@@ -11,6 +11,9 @@ class SignupAPI(MethodView):
 
         email = data.get('email')
         password = data.get('password')
+        first_name = data.get('first_name', '')
+        last_name = data.get('last_name', '')
+        username = data.get('username', '')
 
         if not email or not password:
             return jsonify({"message": "Missing email or password"}), 400
@@ -29,10 +32,10 @@ class SignupAPI(MethodView):
 
         # Insert new user
         insert_query = """
-        INSERT INTO user (email, password)
-        VALUES (%s, %s)
+        INSERT INTO user (email, password, first_name, last_name, username)
+        VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(insert_query, (email, password))
+        cursor.execute(insert_query, (email, password, first_name, last_name, username))
         db.commit()
 
         cursor.close()

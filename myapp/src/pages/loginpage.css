@@ -170,6 +170,15 @@ body {
   gap: 20px;
 }
 
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-row .field-group {
+  flex: 1;
+}
+
 .field-group {
   display: flex;
   flex-direction: column;

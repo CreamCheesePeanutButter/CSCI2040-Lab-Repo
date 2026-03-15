@@ -6,6 +6,9 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -50,7 +53,7 @@ function LoginPage() {
   };
 
   const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
       setErrorMessage("All fields are required.");
       return;
     }
@@ -74,7 +77,7 @@ function LoginPage() {
     const response = await fetch("http://127.0.0.1:5000/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName, username }),
     });
 
     const data = await response.json();
@@ -86,6 +89,9 @@ function LoginPage() {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+      setFirstName("");
+      setLastName("");
+      setUsername("");
     } else if (response.status === 400) {
       setErrorMessage("Email already in use or invalid data.");
     } else {
@@ -109,6 +115,9 @@ function LoginPage() {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+    setFirstName("");
+    setLastName("");
+    setUsername("");
     setShowPassword(false);
   };
 
@@ -163,6 +172,46 @@ function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
+          {!isLogin && (
+            <>
+              <div className="field-row">
+                <div className="field-group">
+                  <label className="field-label">FIRST NAME</label>
+                  <input
+                    className="text-input"
+                    type="text"
+                    placeholder="John"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    autoComplete="given-name"
+                  />
+                </div>
+                <div className="field-group">
+                  <label className="field-label">LAST NAME</label>
+                  <input
+                    className="text-input"
+                    type="text"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    autoComplete="family-name"
+                  />
+                </div>
+              </div>
+              <div className="field-group">
+                <label className="field-label">USERNAME</label>
+                <input
+                  className="text-input"
+                  type="text"
+                  placeholder="johndoe"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                />
+              </div>
+            </>
+          )}
+
           <div className="field-group">
             <label className="field-label">EMAIL</label>
             <input

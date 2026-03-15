@@ -22,6 +22,22 @@ const Homepage = () => {
   const [currency, setCurrency] = useState("USD");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exchanging, setExchanging] = useState(false);
+
+  const handleExchange = () => {
+    if (exchanging) return;
+    setExchanging(true);
+    fetch(`${API_URL}/stocks/exchange`, { method: "POST" })
+      .then((res) => res.json())
+      .then((data) => {
+        setCurrency(data.currency);
+        return fetch(`${API_URL}/stocks`);
+      })
+      .then((res) => res.json())
+      .then((data) => setStocks(data.stocks))
+      .catch((err) => setError(err instanceof Error ? err.message : "Unknown error"))
+      .finally(() => setExchanging(false));
+  };
 
   useEffect(() => {
     const fetchStocks = async () => {
@@ -49,33 +65,21 @@ const Homepage = () => {
       <div className="hw-content">
         <h2 className="hw-title">Market</h2>
         <div className="hw-table-wrap">
-          {/* added currency display. I havent create the css style for this yet */}
-          <text className="hw-currency">Currency: {currency}</text>
-          {/* create button */}
-          <button
-            className="hw-button"
-            onClick={() => {
-              // Implementation for changing currency
-              fetch(`${API_URL}/stocks/exchange`, {
-                method: "POST",
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  setCurrency(data.currency);
-                  // Optionally, you can also refetch the stock data here to update the prices
-                  return fetch(`${API_URL}/stocks`);
-                })
-                .then((res) => res.json())
-                .then((data) => setStocks(data.stocks))
-                .catch((err) =>
-                  setError(
-                    err instanceof Error ? err.message : "Unknown error",
-                  ),
-                );
-            }}
-          >
-            Change to {currency === "USD" ? "CAD" : "USD"}
-          </button>
+          <div className="hw-currency-bar">
+            <span className="hw-currency-label">Currency</span>
+            <div className={`hw-currency-toggle${exchanging ? " hw-toggle-busy" : ""}`}>
+              <button
+                className={`hw-toggle-opt${currency === "USD" ? " hw-toggle-active" : ""}`}
+                onClick={() => currency !== "USD" && handleExchange()}
+                disabled={exchanging}
+              >USD</button>
+              <button
+                className={`hw-toggle-opt${currency === "CAD" ? " hw-toggle-active" : ""}`}
+                onClick={() => currency !== "CAD" && handleExchange()}
+                disabled={exchanging}
+              >CAD</button>
+            </div>
+          </div>
           <table className="hw-table">
             <thead>
               <tr>

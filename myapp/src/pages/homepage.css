@@ -70,6 +70,59 @@
   background: var(--bg-card);
 }
 
+.hw-currency-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
+}
+
+.hw-currency-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.hw-currency-toggle {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.hw-toggle-busy {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.hw-toggle-opt {
+  padding: 5px 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.hw-toggle-opt:hover:not(.hw-toggle-active) {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.hw-toggle-active {
+  background: var(--xbox-green);
+  color: #fff !important;
+  cursor: default;
+}
+
 .hw-table {
   width: 100%;
   border-collapse: collapse;
