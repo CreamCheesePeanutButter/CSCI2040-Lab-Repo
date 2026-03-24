@@ -222,3 +222,9 @@ user_bp.add_url_rule(
     view_func=sell_view,
     methods=["POST"]
 )
+
+
+
+
+#############TEST CODE ONLY
+

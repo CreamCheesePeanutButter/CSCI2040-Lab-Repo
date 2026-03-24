@@ -21,7 +21,7 @@ DB_CONFIG = {
     "database": "creamcheesepeanutbutter_users",
 }
 
-TABLE = "user_test"
+TABLE = "test_user"
 
 
 def get_connection():
