@@ -2,7 +2,7 @@ from flask import request, Blueprint, jsonify, session
 from flask.views import MethodView
 from db import get_db
 from tracker.user import User
-from datetime import datetime
+from datetime import datetime, timedelta
 
 user_bp = Blueprint('user_api', __name__)
 
@@ -82,21 +82,55 @@ user_bp.add_url_rule(
 
 ###########################Buy stock 
 
-
-class BuyTradeAPI(MethodView):
+from tracker.stock_tracker import StockTracker
+_stockTracker = StockTracker()
+def update_stocks():
+    db = get_db()         # connection
+    cursor = db.cursor()  # cursor object
+    # check if the last called time is more than 1 minute ago, if so, update the stock data
+    cursor.execute("SELECT last_call FROM stock LIMIT 1")
+    result = cursor.fetchone()
+    if result is None or (result[0] is None) or (result[0] < (datetime.now() - timedelta(minutes=1))):
+        for ticker, stock in _stockTracker.get_stocks().items():
+            cursor.execute(
+                """
+                INSERT INTO stock (stock_key, current_price, high_price, low_price, open_price, previous_close, name, currency)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                    current_price = VALUES(current_price),
+                    high_price = VALUES(high_price),
+                    low_price = VALUES(low_price),
+                    open_price = VALUES(open_price),
+                    previous_close = VALUES(previous_close),
+                    name = VALUES(name),
+                    currency = VALUES(currency)
+                """,
+                (ticker, stock.current_price, stock.high_today, stock.low_today, stock.open_price, stock.previous_close, stock.name, stock.currency)
+            )
+        db.commit()
+        cursor.close()
+class BuyAPI(MethodView):
 
     def post(self, user_id):
-
+        update_stocks()
         data = request.get_json()
 
         num_share = data.get("num_share")
         stock_key = data.get("stock_key")
 
-        if not num_share or not stock_key:
-            return jsonify({"message": "Missing data"}), 400
-
         db = get_db()
         cursor = db.cursor(dictionary=True)
+
+        # get user
+        cursor.execute(
+            "SELECT * FROM user WHERE userID = %s",
+            (user_id,)
+        )
+
+        user_data = cursor.fetchone()
+
+        if not user_data:
+            return jsonify({"message": "User not found"}), 404
 
         # get stock price
         cursor.execute(
@@ -110,11 +144,36 @@ class BuyTradeAPI(MethodView):
             return jsonify({"message": "Stock not found"}), 404
 
         price = stock["current_price"]
-        total_cost = price * num_share
 
-        # get user funds
+        user = User.from_dict(user_data)
+
+        success = user.buy(num_share, price, stock_key)
+
+        if not success:
+            return jsonify({"message": "Not enough funds"}), 400
+
+        return jsonify({
+            "message": "BUY successful",
+            "price": price,
+            "shares": num_share
+        }), 200
+
+
+class SellAPI(MethodView):
+
+    def post(self, user_id):
+        update_stocks()
+        data = request.get_json()
+
+        num_share = data.get("num_share")
+        stock_key = data.get("stock_key")
+
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        # get user
         cursor.execute(
-            "SELECT available_funds FROM user WHERE userID = %s",
+            "SELECT * FROM user WHERE userID = %s",
             (user_id,)
         )
 
@@ -123,78 +182,7 @@ class BuyTradeAPI(MethodView):
         if not user_data:
             return jsonify({"message": "User not found"}), 404
 
-        if user_data["available_funds"] < total_cost:
-            return jsonify({"message": "Not enough funds"}), 400
-
-        # deduct funds
-        cursor.execute(
-            "UPDATE user SET available_funds = available_funds - %s WHERE userID = %s",
-            (total_cost, user_id)
-        )
-
-        # store trade
-        cursor.execute(
-            """
-            INSERT INTO TradeTable (userID, stock_symbol, price, number_of_shares, transaction_date, transaction_type)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (user_id, stock_key, price, num_share, datetime.now(), "BUY")
-        )
-
-        db.commit()
-        cursor.close()
-
-        return jsonify({
-            "message": "Stock purchased",
-            "price": price,
-            "shares": num_share,
-            "total_cost": total_cost
-        }), 200
-    
-user_buy_view = BuyTradeAPI.as_view('buy_stock_api')
-user_bp.add_url_rule(
-    '/user/<int:user_id>/buy',
-    view_func=user_buy_view,
-    methods=['POST']
-)
-    
-
-class SellTradeAPI(MethodView):
-
-    def post(self, user_id):
-
-        data = request.get_json()
-
-        num_share = data.get("num_share")
-        stock_key = data.get("stock_key")
-
-        if not num_share or not stock_key:
-            return jsonify({"message": "Missing data"}), 400
-
-        db = get_db()
-        cursor = db.cursor(dictionary=True)
-
-        # check how many shares user owns
-        cursor.execute(
-            """
-            SELECT SUM(number_of_shares) as total_shares
-            FROM TradeTable
-            WHERE userID = %s AND stock_symbol = %s
-            """,
-            (user_id, stock_key)
-        )
-
-        result = cursor.fetchone()
-
-        owned_shares = result["total_shares"] if result["total_shares"] else 0
-
-        if owned_shares < num_share:
-            return jsonify({
-                "message": "Not enough shares to sell",
-                "owned_shares": owned_shares
-            }), 400
-
-        # get current stock price
+        # get price
         cursor.execute(
             "SELECT current_price FROM stock WHERE stock_key = %s",
             (stock_key,)
@@ -207,41 +195,30 @@ class SellTradeAPI(MethodView):
 
         price = stock["current_price"]
 
-        total_value = price * num_share
+        user = User.from_dict(user_data)
 
-        # add funds back to user
-        cursor.execute(
-            """
-            UPDATE user
-            SET available_funds = available_funds + %s
-            WHERE userID = %s
-            """,
-            (total_value, user_id)
-        )
+        success = user.sell(num_share, price, stock_key)
 
-        # record sell trade (negative quantity)
-        cursor.execute(
-            """
-            INSERT INTO TradeTable (userID, stock_symbol, price, number_of_shares, transaction_date, transaction_type)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (user_id, stock_key, price, -num_share, datetime.now(), "SELL")
-        )
-
-        db.commit()
-        cursor.close()
+        if not success:
+            return jsonify({"message": "Not enough shares"}), 400
 
         return jsonify({
-            "message": "Stock sold",
+            "message": "SELL successful",
             "price": price,
-            "shares_sold": num_share,
-            "total_value": total_value,
-            "remaining_shares": owned_shares - num_share
+            "shares": num_share
         }), 200
     
-user_sell_view = SellTradeAPI.as_view('sell_stock_api')
+buy_view = BuyAPI.as_view("buy_api")
+sell_view = SellAPI.as_view("sell_api")
+
 user_bp.add_url_rule(
-    '/user/<int:user_id>/sell',
-    view_func=user_sell_view,
-    methods=['POST']
+    "/user/<int:user_id>/buy",
+    view_func=buy_view,
+    methods=["POST"]
+)
+
+user_bp.add_url_rule(
+    "/user/<int:user_id>/sell",
+    view_func=sell_view,
+    methods=["POST"]
 )

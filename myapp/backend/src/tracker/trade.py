@@ -28,11 +28,11 @@ class TradeHistory:
                 ticker=row['stock_symbol'],
                 price=row.get('price', 0),  # Using .get() in case price isn't in the DB yet
                 quantity=row['number_of_shares'],
-                time=row['date_bought']
+                time=row['transaction_date']
             )
             self._trades.append(trade_obj)
             
-        cursor.close() # Good practice to close the cursor
+        cursor.close() 
 
 
     def add_trade(self, trade):
