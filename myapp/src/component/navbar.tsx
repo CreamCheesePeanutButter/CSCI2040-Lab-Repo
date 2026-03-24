@@ -90,6 +90,10 @@ export function Navbar() {
             </Link>
           </li>
           <li>
+            {user ? (<Link to="/user" className="nav-link">Profile</Link>):
+             (<Link to="/login" className="nav-link">Profile</Link>)}
+          </li>
+          <li>
             {user ? (
               <div className="nav-user" ref={menuRef}>
                 <button
