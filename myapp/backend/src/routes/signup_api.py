@@ -38,10 +38,12 @@ class SignupAPI(MethodView):
         cursor.execute(insert_query, (email, password, first_name, last_name, username))
         db.commit()
 
+        user_id = cursor.lastrowid
         cursor.close()
 
         return jsonify({
-            "message": "User registered successfully"
+            "message": "User registered successfully",
+            "user_id": user_id
         }), 201
 
 

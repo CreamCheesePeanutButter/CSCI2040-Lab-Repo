@@ -54,6 +54,8 @@ const Homepage = () => {
       }
     };
     fetchStocks();
+    const interval = setInterval(fetchStocks, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return <div className="hw-state">Loading prices...</div>;

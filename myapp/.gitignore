@@ -25,3 +25,4 @@ dist-ssr
 
 # exclude test.ipynb from git tracking
 test.ipynb
+__pycache__

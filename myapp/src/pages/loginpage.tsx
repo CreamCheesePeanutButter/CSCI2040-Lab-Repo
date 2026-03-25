@@ -1,9 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./loginpage.css";
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
+
 function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email or username for login
+  const [email, setEmail] = useState(""); // email for signup
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -11,7 +19,6 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = (value: string) => {
@@ -19,41 +26,52 @@ function LoginPage() {
   };
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      setErrorMessage("Email and password are required.");
-      return;
-    }
-    if (!validateEmail(email)) {
-      setErrorMessage("Enter a valid email address.");
+    if (!identifier || !password) {
+      setErrorMessage("Email/username and password are required.");
       return;
     }
 
     setIsLoading(true);
     setErrorMessage("");
-    setSuccessMessage("");
 
-    const response = await fetch("http://127.0.0.1:5000/login", {
+    const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      //add token
+      body: JSON.stringify({ identifier, password }),
     });
 
     const data = await response.json();
     setIsLoading(false);
 
     if (response.ok) {
-      setSuccessMessage("Signed in successfully.");
+      login({
+        id: data.user.userID,
+        username: data.user.username,
+        email: data.user.email,
+        balance: data.user.available_funds,
+        //token is here
+        token: data.token,
+      });
+      navigate("/", { replace: true });
     } else if (response.status === 400) {
-      setErrorMessage("Email and password are required.");
+      setErrorMessage("Email/username and password are required.");
     } else if (response.status === 401) {
-      setErrorMessage("Incorrect email or password.");
+      setErrorMessage("Incorrect email/username or password.");
     } else {
       setErrorMessage(data.message || "Something went wrong.");
     }
   };
 
   const handleRegister = async () => {
-    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
+    if (
+      !firstName ||
+      !lastName ||
+      !username ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       setErrorMessage("All fields are required.");
       return;
     }
@@ -72,26 +90,26 @@ function LoginPage() {
 
     setIsLoading(true);
     setErrorMessage("");
-    setSuccessMessage("");
 
-    const response = await fetch("http://127.0.0.1:5000/signup", {
+    const response = await fetch(`${API_URL}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName, username }),
+      body: JSON.stringify({
+        email,
+        password,
+        first_name: firstName,
+        last_name: lastName,
+        username,
+      }),
     });
 
     const data = await response.json();
     setIsLoading(false);
 
     if (response.ok) {
-      setSuccessMessage("Account created. You can now sign in.");
-      setIsLogin(true);
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setFirstName("");
-      setLastName("");
-      setUsername("");
+      navigate("/setup-funds", { state: { userId: data.user_id } });
+    } else if (response.status === 409) {
+      setErrorMessage("An account with that email already exists.");
     } else if (response.status === 400) {
       setErrorMessage("Email already in use or invalid data.");
     } else {
@@ -111,7 +129,7 @@ function LoginPage() {
   const switchMode = (toLogin: boolean) => {
     setIsLogin(toLogin);
     setErrorMessage("");
-    setSuccessMessage("");
+    setIdentifier("");
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -213,14 +231,22 @@ function LoginPage() {
           )}
 
           <div className="field-group">
-            <label className="field-label">EMAIL</label>
+            <label className="field-label">
+              {isLogin ? "EMAIL OR USERNAME" : "EMAIL"}
+            </label>
             <input
               className="text-input"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              type="text"
+              placeholder={
+                isLogin ? "you@example.com or johndoe" : "you@example.com"
+              }
+              value={isLogin ? identifier : email}
+              onChange={(e) =>
+                isLogin
+                  ? setIdentifier(e.target.value)
+                  : setEmail(e.target.value)
+              }
+              autoComplete={isLogin ? "username" : "email"}
             />
           </div>
 
@@ -282,9 +308,6 @@ function LoginPage() {
           )}
 
           {errorMessage && <div className="msg msg-error">{errorMessage}</div>}
-          {successMessage && (
-            <div className="msg msg-success">{successMessage}</div>
-          )}
 
           <button type="submit" className="submit-btn" disabled={isLoading}>
             {isLoading ? (

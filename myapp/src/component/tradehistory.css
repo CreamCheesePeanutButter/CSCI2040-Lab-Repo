@@ -1,0 +1,88 @@
+.th-container {
+  display: block;
+  padding: 25px 32px 32px;
+  color: #f0f0f0;
+}
+
+.th-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 550;
+  font-size: 35px;
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+  color: #52B043;
+}
+
+.th-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0d0d0d;
+  border: 1px solid #1e1e1e;
+}
+
+.th-table th {
+  text-align: center;
+  padding: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: #52B043;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.th-table td {
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #1e1e1e;
+  color: #ccc;
+}
+
+.th-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.th-date {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: #666;
+}
+
+.th-symbol {
+  font-family: 'Share Tech Mono', monospace;
+  color: #52B043;
+  letter-spacing: 0.06em;
+}
+
+.th-badge {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.th-buy {
+  background: rgba(82, 176, 67, 0.15);
+  color: #52B043;
+  border: 1px solid rgba(82, 176, 67, 0.3);
+}
+
+.th-sell {
+  background: rgba(224, 82, 82, 0.15);
+  color: #e05252;
+  border: 1px solid rgba(224, 82, 82, 0.3);
+}
+
+.th-empty {
+  margin-left: 250px;
+  height: calc(100vh - 56px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  color: #666;
+}

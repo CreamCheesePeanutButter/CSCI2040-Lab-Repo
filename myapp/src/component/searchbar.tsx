@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./searchbar.css";
+import { useAuth } from "../context/AuthContext";
+import { useRefresh } from "../context/RefreshContext";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
@@ -33,6 +35,13 @@ function SearchBar() {
   const [selected, setSelected] = useState<StockData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth();
+  const { triggerRefresh } = useRefresh();
+  const [tradeShares, setTradeShares] = useState("");
+  const [tradeLoading, setTradeLoading] = useState(false);
+  const [tradeMsg, setTradeMsg] = useState<string | null>(null);
+  const [tradeMsgType, setTradeMsgType] = useState<"success" | "error">("success");
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +85,48 @@ function SearchBar() {
           s.name.toLowerCase().includes(query.toLowerCase()),
       )
     : [];
+
+  // Reset trade state when a different stock is selected
+  useEffect(() => {
+    setTradeShares("");
+    setTradeMsg(null);
+    setTradeLoading(false);
+  }, [selected?.stock_key]);
+
+  const handleBuy = async () => {
+    const qty = parseInt(tradeShares, 10);
+    if (!qty || qty < 1) {
+      setTradeMsg("Enter a valid number of shares.");
+      setTradeMsgType("error");
+      return;
+    }
+    if (!user || !selected) return;
+    setTradeLoading(true);
+    setTradeMsg(null);
+    try {
+      const res = await fetch(`${API_URL}/user/${user.id}/buy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ num_share: qty, stock_key: selected.stock_key }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setTradeMsg((data as any).message ?? "Buy failed.");
+        setTradeMsgType("error");
+      } else {
+        const price = (data as any).price;
+        setTradeMsg(`Bought ${qty} share${qty > 1 ? "s" : ""}${price != null ? ` at ${fmt(price)}` : ""}`);
+        setTradeMsgType("success");
+        setTradeShares("");
+        triggerRefresh();
+      }
+    } catch {
+      setTradeMsg("Network error — check your connection.");
+      setTradeMsgType("error");
+    } finally {
+      setTradeLoading(false);
+    }
+  };
 
   const handleSelect = (stock: StockData) => {
     setSelected(stock);
@@ -268,6 +319,39 @@ function SearchBar() {
                   </div>
                 </div>
               )}
+
+            {/* Trade section */}
+            <div className="sb-trade-section">
+              <span className="sb-stat-label">TRADE</span>
+              {user ? (
+                <div className="sb-trade-row">
+                  <input
+                    type="number"
+                    className="sb-trade-input"
+                    min="1"
+                    value={tradeShares}
+                    onChange={(e) => setTradeShares(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleBuy()}
+                    placeholder="Shares"
+                  />
+                  <button
+                    className="sb-trade-buy"
+                    onClick={handleBuy}
+                    disabled={tradeLoading}
+                  >
+                    {tradeLoading ? "..." : "BUY"}
+                  </button>
+                </div>
+              ) : (
+                <p className="sb-trade-msg sb-trade-info">Log in to trade</p>
+              )}
+              {tradeMsg && (
+                <p className={`sb-trade-msg ${tradeMsgType === "error" ? "sb-trade-error" : "sb-trade-success"}`}>
+                  {tradeMsg}
+                </p>
+              )}
+            </div>
+
           </div>
         </div>
       )}

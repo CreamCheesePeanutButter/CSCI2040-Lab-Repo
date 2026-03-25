@@ -11,13 +11,13 @@ class AddFundsAPI(MethodView):
         user_id = data.get("user_id")
         amount = data.get("amount")
 
-        if not user_id or not amount:
+        if user_id is None or amount is None:
             return jsonify({"message": "Missing user_id or amount"}), 400
 
         db = get_db()
         cursor = db.cursor()
 
-        query = "UPDATE user SET balance = balance + %s WHERE id = %s"
+        query = "UPDATE user SET available_funds = available_funds + %s WHERE userID = %s"
         cursor.execute(query, (amount, user_id))
         db.commit()
 

@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+
+.sf-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+.sf-card {
+  width: 440px;
+}
+
+.sf-header {
+  margin-bottom: 32px;
+}
+
+.sf-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.2em;
+  color: #f0f0f0;
+  margin-bottom: 6px;
+}
+
+.sf-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  color: #888;
+  letter-spacing: 0.04em;
+}
+
+.sf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sf-amount-display {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 42px;
+  color: #52B043;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.sf-slider-wrap {
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.sf-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #2a2a2a;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.sf-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: #107C10;
+  border-radius: 2px;
+}
+
+.sf-thumb {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background: #52B043;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px rgba(82, 176, 67, 0.6);
+  pointer-events: none;
+}
+
+.sf-range {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  height: 32px;
+  margin: 0;
+}
+
+.sf-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: #555;
+  margin-top: -8px;
+}
