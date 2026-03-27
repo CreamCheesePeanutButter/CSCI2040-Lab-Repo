@@ -15,8 +15,8 @@ class TradeHistory:
 
     def loadTrades(self, userID):
         db = get_db()
-
         cursor = db.cursor(dictionary=True)
+        
         cursor.execute("SELECT * FROM TradeTable WHERE userID = %s", (userID,))
         trades_data = cursor.fetchall()
 
