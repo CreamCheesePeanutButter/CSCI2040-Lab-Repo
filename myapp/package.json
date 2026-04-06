@@ -11,7 +11,7 @@
     "start": "powershell.exe -NoProfile -ExecutionPolicy Unrestricted -Command \"./run.ps1\"",
     "start-backend": "cd backend && .\\venv\\Scripts\\python .\\src\\app.py",
     "start-backend-unix": "cd backend && ./venv/bin/python ./src/api.py",
-    "setup-backend": "cd backend && python -m venv venv && venv\\Scripts\\activate && pip install flask flask_cors mysql-connector-python requests",
+    "setup-backend": "cd backend && python -m venv venv && venv\\Scripts\\activate && pip install flask flask_cors mysql-connector-python requests yfinance",
     "setup-backend-mac": "cd backend && python3 -m venv venv && source venv/bin/activate && pip install flask flask_cors mysql-connector-python requests",
     "clean": "node -e \"const fs=require('fs');const path=require('path');function walk(dir){for(const f of fs.readdirSync(dir)){const p=path.join(dir,f);if(fs.statSync(p).isDirectory()){if(f==='__pycache__'){fs.rmSync(p,{recursive:true,force:true});console.log('removed',p);}else{walk(p);}}else if(f.endsWith('.pyc')){fs.rmSync(p,{force:true});console.log('removed',p);}}}walk(process.cwd());\"",
     "test": "cd backend && venv\\Scripts\\activate && cd src && python -m pytest",

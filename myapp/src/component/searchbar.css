@@ -13,11 +13,13 @@
   height: 34px;
   padding: 0 10px;
   gap: 8px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .sb-input-row:focus-within {
-  border-color: #107C10;
+  border-color: #107c10;
   box-shadow: 0 0 0 2px rgba(16, 124, 16, 0.2);
 }
 
@@ -34,7 +36,7 @@
   border: none;
   outline: none;
   color: #f0f0f0;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -103,14 +105,14 @@
 }
 
 .sb-result-ticker {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 13px;
-  color: #52B043;
+  color: #52b043;
   letter-spacing: 0.06em;
 }
 
 .sb-result-name {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 11px;
   color: #666;
   white-space: nowrap;
@@ -128,21 +130,21 @@
 }
 
 .sb-result-price {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: #f0f0f0;
 }
 
 .sb-result-pct {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.04em;
 }
 
 .sb-no-results {
   padding: 12px 14px;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   color: #555;
   background: #111;
@@ -155,8 +157,12 @@
 }
 
 /* Shared colour tokens */
-.sb-up   { color: #52B043; }
-.sb-down { color: #e05252; }
+.sb-up {
+  color: #52b043;
+}
+.sb-down {
+  color: #e05252;
+}
 
 /* Modal backdrop */
 .sb-modal-backdrop {
@@ -171,8 +177,12 @@
 }
 
 @keyframes sb-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Modal card */
@@ -180,23 +190,36 @@
   position: relative;
   background: #111;
   border: 1px solid #2a2a2a;
-  width: 380px;
+  /* CHANGE THESE VALUES */
+  width: 90%; /* Percentage of the screen width */
+  max-width: 1000px; /* The absolute maximum width it can grow to */
+
+  /* Ensure it doesn't get taller than the screen */
+  max-height: 100vh;
   max-width: calc(100vw - 32px);
   padding: 28px 28px 24px;
   animation: sb-slide-up 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sb-modal::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #107C10, transparent);
+  background: linear-gradient(90deg, transparent, #107c10, transparent);
 }
 
 @keyframes sb-slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .sb-modal-close {
@@ -212,7 +235,9 @@
   line-height: 1;
 }
 
-.sb-modal-close:hover { color: #f0f0f0; }
+.sb-modal-close:hover {
+  color: #f0f0f0;
+}
 
 /* Modal header */
 .sb-modal-header {
@@ -223,14 +248,14 @@
 }
 
 .sb-modal-ticker {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 22px;
-  color: #52B043;
+  color: #52b043;
   letter-spacing: 0.08em;
 }
 
 .sb-modal-name {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 14px;
   color: #666;
 }
@@ -246,7 +271,7 @@
 }
 
 .sb-modal-current {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 32px;
   font-weight: 700;
   color: #f0f0f0;
@@ -254,7 +279,7 @@
 }
 
 .sb-modal-pct {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 13px;
   letter-spacing: 0.04em;
 }
@@ -274,14 +299,14 @@
 }
 
 .sb-stat-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.14em;
-  color: #52B043;
+  color: #52b043;
 }
 
 .sb-stat-value {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #f0f0f0;
@@ -295,10 +320,10 @@
 }
 
 .sb-range-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: "Share Tech Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.14em;
-  color: #52B043;
+  color: #52b043;
 }
 
 .sb-range-bar {
@@ -313,7 +338,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  background: #107C10;
+  background: #107c10;
   border-radius: 2px;
 }
 
@@ -322,7 +347,7 @@
   top: 50%;
   width: 10px;
   height: 10px;
-  background: #52B043;
+  background: #52b043;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   border: 2px solid #111;
@@ -331,7 +356,7 @@
 .sb-range-ends {
   display: flex;
   justify-content: space-between;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 12px;
   color: #555;
 }
@@ -356,7 +381,7 @@
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   color: #f0f0f0;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 14px;
   padding: 8px 10px;
   outline: none;
@@ -364,14 +389,14 @@
 }
 
 .sb-trade-input:focus {
-  border-color: #107C10;
+  border-color: #107c10;
 }
 
 .sb-trade-buy {
-  background: #107C10;
+  background: #107c10;
   border: none;
   color: #fff;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.1em;
@@ -380,15 +405,26 @@
   transition: background 0.2s;
 }
 
-.sb-trade-buy:hover:not(:disabled) { background: #52B043; }
-.sb-trade-buy:disabled { opacity: 0.5; cursor: not-allowed; }
+.sb-trade-buy:hover:not(:disabled) {
+  background: #52b043;
+}
+.sb-trade-buy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .sb-trade-msg {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Rajdhani", sans-serif;
   font-size: 13px;
   margin: 0;
 }
 
-.sb-trade-success { color: #52B043; }
-.sb-trade-error   { color: #e05252; }
-.sb-trade-info    { color: #555; }
+.sb-trade-success {
+  color: #52b043;
+}
+.sb-trade-error {
+  color: #e05252;
+}
+.sb-trade-info {
+  color: #555;
+}
