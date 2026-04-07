@@ -7,14 +7,15 @@ type Trade = {
   price: number;
   total: number;
   type: "BUY" | "SELL";
-  date: string;
+  date: string  ;
 };
 
 type TradeHistoryProps = {
   history: Trade[];
+  userId: number;
 };
 
-export function TradeHistory({ history }: TradeHistoryProps) {
+export function TradeHistory({ history, userId }: TradeHistoryProps) {
   if (history.length === 0) {
     return <div className="th-empty">No trades yet</div>;
   }
@@ -22,6 +23,14 @@ export function TradeHistory({ history }: TradeHistoryProps) {
   return (
     <div className="th-container">
       <h2 className="th-title">Trade History</h2>
+
+      <a
+        className="th-a"
+        href={`http://localhost:5000/user/${userId}/generate-history-download`}
+      >
+        Export Trade History
+      </a>
+
       <table className="th-table">
         <thead>
           <tr>

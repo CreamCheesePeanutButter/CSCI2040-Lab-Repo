@@ -86,3 +86,20 @@
   letter-spacing: 0.1em;
   color: #666;
 }
+
+
+
+.th-a {
+  display: inline-block;
+  margin-top: 10px;
+  color: #52B043;
+  background-color: #0d0d0d;
+  box-shadow: 0 0 12px rgba(16, 124, 16, 0.25);
+  border: 1px solid rgba(84, 12, 1, 0.25);
+}
+
+.th-a a:hover {
+  border-color: rgba(84, 12, 1, 0.25);
+  box-shadow: 0 0 12px rgba(16, 124, 16, 0.25);
+  color: #f0f0f0;
+}

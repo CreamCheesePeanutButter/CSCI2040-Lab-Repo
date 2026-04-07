@@ -1,8 +1,10 @@
-from flask import request, Blueprint, jsonify, session
+from io import StringIO
+
+from flask import Response, request, Blueprint, jsonify, session
 from flask.views import MethodView
 from db import get_db
 from tracker.user import User
-from datetime import datetime, timedelta
+from datetime importdatetime, timedelta
 
 user_bp = Blueprint('user_api', __name__)
 
@@ -18,6 +20,7 @@ class UserAPI(MethodView):
             users = cursor.fetchall() #store all user data
             cursor.close()
             print(users)
+            db.close()
             return jsonify({
                 "users": [
                     {
@@ -70,7 +73,7 @@ class UserFundsAPI(MethodView):
         cursor.execute("UPDATE user SET available_funds = available_funds + %s WHERE userID = %s", (amount, user_id))
         db.commit()
         cursor.close()
-
+        db.close()
         return jsonify({"message": "Funds added successfully"}), 200
     
 user_funds_view = UserFundsAPI.as_view('user_funds_api')
@@ -109,6 +112,8 @@ def update_stocks():
             )
         db.commit()
         cursor.close()
+        db.close()
+
 class BuyAPI(MethodView):
 
     def post(self, user_id):
@@ -151,7 +156,7 @@ class BuyAPI(MethodView):
 
         if not success:
             return jsonify({"message": "Not enough funds"}), 400
-
+        db.close()
         return jsonify({
             "message": "BUY successful",
             "price": price,
@@ -199,9 +204,11 @@ class SellAPI(MethodView):
 
         success = user.sell(num_share, price, stock_key)
 
+        db.close()
+
         if not success:
             return jsonify({"message": "Not enough shares"}), 400
-
+        
         return jsonify({
             "message": "SELL successful",
             "price": price,
@@ -251,7 +258,7 @@ class PortfolioAPI(MethodView):
 
         holdings = cursor.fetchall()
         cursor.close()
-
+        db.close()
         return jsonify({
             "portfolio": [
                 {
@@ -292,6 +299,7 @@ class TradeHistoryAPI(MethodView):
 
         rows = cursor.fetchall()
         cursor.close()
+        db.close()
 
         return jsonify({
             "history": [
@@ -313,3 +321,88 @@ user_bp.add_url_rule(
     view_func=history_view,
     methods=["GET"]
 )
+
+class GenerateHistoryDownloadAPI(MethodView):
+
+    def get(self, user_id):
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM user WHERE userID = %s", (user_id,))
+        users = cursor.fetchall()
+
+        cursor.execute("CALL GetTradeHistory(%s)", (user_id,))
+        rows = cursor.fetchall()
+        while cursor.nextset():
+            pass
+
+        cursor.close()
+        
+
+
+        userDict = jsonify({
+            "users": [
+                {
+                    "id": user['userID'],
+                    "email": user['email'],
+                    "first_name": user['first_name'],
+                    "last_name": user['last_name'],
+                    "username": user['username'],
+                    "available_funds": user['available_funds']
+                } for user in users
+            ]
+        })
+
+        output = StringIO()
+        
+        header = f"{'Date':<18} {'Symbol':<10} {'Type':<6} {'Shares':<8} {'Price':<10} {'Total':<10}\n"
+        separator = "-" * 70 + "\n"
+        headerSeparator = "=" * 70 + "\n"
+
+        output.write(f"TRADE HISTORY\t\tUSERNAME: {userDict.json['users'][0]['username']}\t\tDATE: {datetime.today().strftime('%Y-%m-%d')}\n")
+        output.write(headerSeparator)
+        output.write(header)
+        output.write(separator)
+
+        for r in rows:
+            print(r)
+            shares = abs(int(r["number_of_shares"]))
+            price = float(r["price"])
+            total = float(shares) * price
+            date = r["transaction_date"]
+            if isinstance(date, str):
+                date_str = date
+            else:
+                date_str = date.strftime("%Y-%m-%d %H:%M")
+
+
+            line = (
+                f"{date_str:<18} "
+                f"{str(r['stock_symbol']):<10} "
+                f"{str(r['transaction_type']):<6} "
+                f"{shares:<8} "
+                f"${price:<9.2f} "
+                f"${total:<9.2f}\n"
+            )
+
+            output.write(line)
+
+            output.write(separator)
+        output.seek(0)
+
+        db.close()
+        return Response(
+            output,
+            mimetype="text/plain",
+            headers={
+                "Content-Disposition": f"attachment; filename=trade_history_user_{user_id}.txt"
+            }
+        )
+
+download_view = GenerateHistoryDownloadAPI.as_view("generate_history_download_api")
+user_bp.add_url_rule(
+    "/user/<int:user_id>/generate-history-download",
+    view_func=download_view,
+    methods=["GET"]
+)
+

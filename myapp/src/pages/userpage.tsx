@@ -85,7 +85,7 @@ function Userpage() {
             onTradeComplete={fetchData}
           />
         ) : (
-          <TradeHistory history={history} />
+          <TradeHistory history={history} userId={user.id} />
         )}
       </div>
     </>
