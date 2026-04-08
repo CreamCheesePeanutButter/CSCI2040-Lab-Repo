@@ -61,3 +61,12 @@ npm run start-backend
 ```.sh
 npm run start-backend-unix
 ```
+
+### How to clean all the pycached (not updated for Mac user)
+
+- For Window user:
+
+```.ps1
+npm run clean
+```
+
