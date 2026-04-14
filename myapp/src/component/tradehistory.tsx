@@ -1,4 +1,3 @@
-import React from "react";
 import "./tradehistory.css";
 
 type Trade = {
@@ -7,7 +6,7 @@ type Trade = {
   price: number;
   total: number;
   type: "BUY" | "SELL";
-  date: string  ;
+  date: string;
 };
 
 type TradeHistoryProps = {
@@ -48,7 +47,9 @@ export function TradeHistory({ history, userId }: TradeHistoryProps) {
               <td className="th-date">{t.date}</td>
               <td className="th-symbol">{t.symbol}</td>
               <td>
-                <span className={`th-badge ${t.type === "BUY" ? "th-buy" : "th-sell"}`}>
+                <span
+                  className={`th-badge ${t.type === "BUY" ? "th-buy" : "th-sell"}`}
+                >
                   {t.type}
                 </span>
               </td>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./portfolio.css";
 import { useAuth } from "../context/AuthContext";
 
@@ -27,10 +27,16 @@ export function Portfolio({ user, onTradeComplete }: PortfolioProps) {
   const [sellRow, setSellRow] = useState<string | null>(null);
   const [sellQty, setSellQty] = useState("");
   const [sellLoading, setSellLoading] = useState(false);
-  const [sellMsg, setSellMsg] = useState<{ symbol: string; msg: string; type: "success" | "error" } | null>(null);
+  const [sellMsg, setSellMsg] = useState<{
+    symbol: string;
+    msg: string;
+    type: "success" | "error";
+  } | null>(null);
 
   if (!user || user.portfolio.length === 0) {
-    return <div className="portfolio-empty">You don't have any active trades</div>;
+    return (
+      <div className="portfolio-empty">You don't have any active trades</div>
+    );
   }
 
   const handleSell = async (symbol: string) => {
@@ -50,9 +56,17 @@ export function Portfolio({ user, onTradeComplete }: PortfolioProps) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setSellMsg({ symbol, msg: data.message ?? "Sell failed.", type: "error" });
+        setSellMsg({
+          symbol,
+          msg: data.message ?? "Sell failed.",
+          type: "error",
+        });
       } else {
-        setSellMsg({ symbol, msg: `Sold ${qty} share${qty > 1 ? "s" : ""}`, type: "success" });
+        setSellMsg({
+          symbol,
+          msg: `Sold ${qty} share${qty > 1 ? "s" : ""}`,
+          type: "success",
+        });
         setSellRow(null);
         setSellQty("");
         onTradeComplete?.();
@@ -83,7 +97,8 @@ export function Portfolio({ user, onTradeComplete }: PortfolioProps) {
 
         <tbody>
           {user.portfolio.map((holding) => {
-            const profit = (holding.currentPrice - holding.avgPrice) * holding.shares;
+            const profit =
+              (holding.currentPrice - holding.avgPrice) * holding.shares;
             const isSelling = sellRow === holding.symbol;
 
             return (
@@ -106,7 +121,9 @@ export function Portfolio({ user, onTradeComplete }: PortfolioProps) {
                         max={holding.shares}
                         value={sellQty}
                         onChange={(e) => setSellQty(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSell(holding.symbol)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && handleSell(holding.symbol)
+                        }
                         placeholder="Qty"
                         autoFocus
                       />
@@ -119,7 +136,11 @@ export function Portfolio({ user, onTradeComplete }: PortfolioProps) {
                       </button>
                       <button
                         className="portfolio-sell-cancel"
-                        onClick={() => { setSellRow(null); setSellQty(""); setSellMsg(null); }}
+                        onClick={() => {
+                          setSellRow(null);
+                          setSellQty("");
+                          setSellMsg(null);
+                        }}
                       >
                         Cancel
                       </button>
@@ -127,13 +148,19 @@ export function Portfolio({ user, onTradeComplete }: PortfolioProps) {
                   ) : (
                     <button
                       className="portfolio-sell-btn"
-                      onClick={() => { setSellRow(holding.symbol); setSellQty(""); setSellMsg(null); }}
+                      onClick={() => {
+                        setSellRow(holding.symbol);
+                        setSellQty("");
+                        setSellMsg(null);
+                      }}
                     >
                       Sell
                     </button>
                   )}
                   {sellMsg?.symbol === holding.symbol && (
-                    <p className={`portfolio-sell-msg ${sellMsg.type === "error" ? "portfolio-sell-error" : "portfolio-sell-success"}`}>
+                    <p
+                      className={`portfolio-sell-msg ${sellMsg.type === "error" ? "portfolio-sell-error" : "portfolio-sell-success"}`}
+                    >
                       {sellMsg.msg}
                     </p>
                   )}

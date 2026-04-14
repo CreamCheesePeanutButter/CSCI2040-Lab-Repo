@@ -62,14 +62,16 @@ class AdminAPI(MethodView):
         password = data.get("password")
         first_name = data.get("first_name")
         last_name = data.get("last_name")
+        email = data.get("email")
 
+        
 
         db = get_db()
         cursor = db.cursor()
-        cursor.execute(
-            "INSERT INTO user (username, password, first_name, last_name, admin_access) VALUES (%s, %s, %s, %s, 0)",
-            (username, password, first_name, last_name)
-        )
+        insert_query = """
+        CALL AddNewUser(%s, %s, %s, %s, %s);
+        """
+        cursor.execute(insert_query, (email, password, first_name, last_name, username))
         db.commit()
 
         return jsonify({"message": "User created successfully"})

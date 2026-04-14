@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
-import { colors } from "@mui/material";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
@@ -35,7 +34,7 @@ export default function StockChart({ ticker }: Props) {
         const data = await res.json();
 
         const history: HistoryPoint[] = (data.history ?? []).filter(
-          (h) => h?.date && h.open != null && h.close != null,
+          (h: HistoryPoint) => h?.date && h.open != null && h.close != null,
         );
 
         setDates(history.map((h) => h.date));

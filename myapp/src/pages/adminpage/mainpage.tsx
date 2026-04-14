@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { BarChart } from "@mui/x-charts/BarChart";
-
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 interface Transaction {
   tradeID: number;
   userID: number;
@@ -29,10 +29,10 @@ export const AdminMainPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const tRes = await fetch("http://localhost:5000/admin/transactions");
+        const tRes = await fetch(`${API_URL}/admin/transactions`);
         const tData = await tRes.json();
 
-        const uRes = await fetch("http://localhost:5000/admin/users");
+        const uRes = await fetch(`${API_URL}/admin/users`);
         const uData = await uRes.json();
 
         console.log("transactions:", tData);
